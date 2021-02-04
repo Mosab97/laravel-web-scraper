@@ -27,11 +27,17 @@ class RealEstateController extends Controller
         return view('real_estate.create');
     }
 
+    public function edit(Request $request, $id)
+    {
+        $real_estate = $this->_model->findOrFail($id);
+        return view('real_estate.create', compact('real_estate'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|min:3|max:100',
-            'price' => 'required|numeric',
+            'price' => 'required',
             'images' => 'nullable|array',
         ]);
         if (isset($request->real_estate_id)) {
@@ -41,19 +47,29 @@ class RealEstateController extends Controller
         }
         $store->title = $request->title;
         $store->price = $request->price;
+        $store->save();
         if (isset($request->images) && is_array($request->images)) {
+            $store->images()->delete();
             foreach ($request->images as $index => $image) {
                 $image_store = new RealEstateImages();
-                $image_store->image = $this->uploadImage($image, 'real_estate');
+                $image_store->image = asset($this->uploadImage($image, 'real_estate'));
                 $image_store->real_estate_id = $store->id;
                 $image_store->save();
             }
         }
         if (isset($request->real_estate_id)) {
-            return redirect()->route('real_estate.index')->with('m-class', 'success')->with('message', t('Successfully Updated'));
+            return redirect()->route('real_estate.index')->with('m-class', 'success')->with('message', 'Successfully Updated');
         } else {
-            return redirect()->route('real_estate.index')->with('m-class', 'success')->with('message', t('Successfully Created'));
+            return redirect()->route('real_estate.index')->with('m-class', 'success')->with('message', 'Successfully Created');
         }
+
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $item = $this->_model->findOrFail($id);
+        $item->delete();
+        return redirect()->route('real_estate.index')->with('m-class', 'success')->with('message', 'Deleted Successfully');
 
     }
 }

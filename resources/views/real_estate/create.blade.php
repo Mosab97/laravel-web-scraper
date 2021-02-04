@@ -30,14 +30,24 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Price</label>
-                            <input type="number" class="form-control" id="exampleInputPassword1" placeholder="Price"
+                            <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Price"
                                    name="price"
                                    value="{{isset($real_estate)? $real_estate->price : old('price')}}"
                             >
                         </div>
                         <div class="form-group">
                             <label for="exampleFormControlFile1">Real Estate Images</label>
-                            <input type="file" multiple class="form-control-file" id="exampleFormControlFile1" name="images[]">
+                            <input type="file" multiple class="form-control-file" id="exampleFormControlFile1"
+                                   name="images[]">
+                            <br>
+                            @isset($real_estate)
+                                @php
+                                    $images = $real_estate->images;
+                                @endphp
+                                @foreach($images as $image)
+                                    <a href="{{$image->image}}" target="_blank">brows</a>
+                                @endforeach
+                            @endisset
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
