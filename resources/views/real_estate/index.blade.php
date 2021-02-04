@@ -9,8 +9,13 @@
 
                     <div class="d-flex justify-content-between">
                         <div class="card-header">{{count($real_esats)}} Real Estates</div>
-                        <a href="{{route('real_estate.create')}}" class="btn btn-info " style="margin: 5px">Add Real
-                            Estate</a>
+
+                    @if(count($real_esats) == 0)
+                        <a href="{{route('real_estate.get_data')}}" class="btn btn-info " style="margin: 5px">get Real Estate</a>
+
+                        @else
+                        <a href="{{route('real_estate.create')}}" class="btn btn-info " style="margin: 5px">Add Real Estate</a>
+                        @endif
                     </div>
 
                     @if(count($real_esats) > 0)
