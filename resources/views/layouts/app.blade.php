@@ -55,6 +55,7 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('logout') }}"> {{ __('Dashboard') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -73,6 +74,20 @@
         </nav>
 
         <main class="py-4">
+            @if(Session::has('message'))
+                <div class="alert alert-{{ Session::get('m-class') }}" role="alert">
+                    {{ Session::get('message') }}
+                </div>
+            @endif
+            @if (count($errors) > 0)
+                <div class="alert alert-warning">
+                    <ul style="width: 100%;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             @yield('content')
         </main>
     </div>

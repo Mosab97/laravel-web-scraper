@@ -2,27 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\RealEstate;
+use App\RealEstateImages;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Sunra\PhpSimple\HtmlDomParser;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
-//        $this->middleware('auth');
+        $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+
     public function index(Request $request)
     {
         //Get url param for scraping
@@ -40,24 +33,22 @@ class HomeController extends Controller
 
         $response_status_code = $response->getStatusCode();
         $html = $response->getBody()->getContents();
-        if($response_status_code==200){
-            $dom = HtmlDomParser::str_get_html( $html );
+        if ($response_status_code == 200) {
+            $dom = HtmlDomParser::str_get_html($html);
 
-//            $song_items = $dom->find('div[class="chart-list-item"]');
-            $song_items = $dom->find('h6[class="card-title"]');
-            dd($song_items[0]->text());
-            $count = 1;
-            foreach ($song_items as $song_item){
-                if($count==1){
-                    $song_title = trim($song_item->find('span[class="chart-list-item__title-text"]',0)->text());
-                    $song_artist = trim($song_item->find('div[class="chart-list-item__artist"]',0)->text());
-
-                    $song_lyrics_parent = $song_item->find('div[class="chart-list-item__lyrics"]',0)->find('a',0);
-                    $song_lyrics_href = $song_lyrics_parent->attr['href'];
-
-                    //Store in database
+            $get_elements = $dom->find('div[class="col-12 col-md-3 col-xl-3  pl-0 p-1"]');
+            foreach ($get_elements as $element) {
+                $store = new RealEstate();
+                $store->price = trim($element->find('button[class="price2"]', 0)->text());
+                $store->title = trim($element->find('h6[class="card-title  mb-0"]', 0)->text());
+                $store->save();
+                $get_images = $element->find('img[class="card-img-top rounded-0 w-100 lazy"]');
+                foreach ($get_images as $index => $image) {
+                    $image_store = new RealEstateImages();
+                    $image_store->image = $image->attr['src'];
+                    $image_store->real_estate_id = $store->id;
+                    $image_store->save();
                 }
-                $count++;
             }
         }
 
